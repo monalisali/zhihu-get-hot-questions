@@ -3,6 +3,10 @@ package modules;
 import Dto.QuestionResultDto;
 import Utils.ConstantsHelper;
 import org.apache.commons.codec.Charsets;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +14,8 @@ import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class QuestionFromBaidu implements Question {
     private static String _baiduUrlPrefix = "https://www.baidu.com/s?ie=utf-8";
@@ -34,11 +40,14 @@ public class QuestionFromBaidu implements Question {
 
     @Override
     public List<QuestionResultDto> getQuestion() {
+        List<QuestionResultDto> pagedHtmlList = new ArrayList<>();
         List<QuestionResultDto> result = new ArrayList<>();
         for (String q : hotWordList
         ) {
-            result.addAll(sendHttpGetRequest(q));
+            pagedHtmlList.addAll(sendHttpGetRequest(q));
         }
+        List<QuestionResultDto> links = parsePagedHtml(pagedHtmlList);
+        result.addAll(links.stream().distinct().collect(Collectors.toList()));
         return result;
     }
 
@@ -81,10 +90,24 @@ public class QuestionFromBaidu implements Question {
         return results;
     }
 
-    private List<QuestionResultDto> parseHtml(List<QuestionResultDto> html)
-    {
+    private List<QuestionResultDto> parsePagedHtml(List<QuestionResultDto> pagedHmls) {
         List<QuestionResultDto> result = new ArrayList<>();
-
+        for(int i = 0 ; i < pagedHmls.size();i++){
+            QuestionResultDto html = pagedHmls.get(i);
+            Document document = Jsoup.parse(html.getPagedHtmlResponse());
+            Elements elements = document.getElementsByTag("h3");
+            for (Element el : elements
+            ) {
+                Element link = el.select("a").first();
+                String href = link.attr("href");
+                if (!href.isEmpty()) {
+                    QuestionResultDto temp = new QuestionResultDto();
+                    temp.setLinkIndex(i + 1);
+                    temp.setLink(href);
+                    result.add(temp);
+                }
+            }
+        }
         return result;
     }
 }

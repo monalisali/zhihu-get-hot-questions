@@ -1,6 +1,13 @@
 package Dto;
 
+import java.util.Objects;
+
 public class QuestionResultDto {
+    private int pageIndex;
+    private String pagedHtmlResponse;
+    private int linkIndex;
+    private String link;
+
     public int getPageIndex() {
         return pageIndex;
     }
@@ -9,7 +16,6 @@ public class QuestionResultDto {
         this.pageIndex = pageIndex;
     }
 
-    private int pageIndex;
 
     public String getPagedHtmlResponse() {
         return pagedHtmlResponse;
@@ -19,5 +25,34 @@ public class QuestionResultDto {
         this.pagedHtmlResponse = pagedHtmlResponse;
     }
 
-    private String pagedHtmlResponse;
+
+    public int getLinkIndex() {
+        return linkIndex;
+    }
+
+    public void setLinkIndex(int linkIndex) {
+        this.linkIndex = linkIndex;
+    }
+
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QuestionResultDto that = (QuestionResultDto) o;
+        return Objects.equals(link, that.link);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(link);
+    }
 }
