@@ -41,6 +41,7 @@ public class QuestionFromZhihu extends QuestionBase implements IQuestion {
             HttpsURLConnection conn = SendRequest.createHttpConnectionTest(url.toString(), isConnectedByProxy);
             if(conn != null){
                String resp = Helper.getHttpsURLConnectionResponse(conn);
+               String aa = "aa";
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
