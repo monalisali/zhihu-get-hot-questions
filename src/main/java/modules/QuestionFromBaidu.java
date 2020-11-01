@@ -19,8 +19,9 @@ import java.util.stream.Collectors;
 
 
 public class QuestionFromBaidu implements Question {
-    private static String _baiduUrlPrefix = "https://www.baidu.com/s?ie=utf-8";
-    private static String _zhihuSpecificSite = "site:www.zhihu.com";
+    private static Properties properties = Helper.GetAppProperties();
+    private static String _baiduUrlPrefix = properties.getProperty("baiduUrlPrefix");
+    private static String _zhihuSpecificSite = properties.getProperty("zhihuSpecificSite");
     //所有热词
     private List<String> hotWordList;
     //搜索时，是否加上site:www.zhihu.com
