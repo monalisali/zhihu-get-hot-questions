@@ -19,7 +19,10 @@ import java.util.stream.Collectors;
 
 public class QuestionFromBaidu implements Question {
     private static String _baiduUrlPrefix = "https://www.baidu.com/s?ie=utf-8";
+    private static String _zhihuSpecificSite = "site:www.zhihu.com";
+    //所有热词
     private List<String> hotWordList;
+    //搜索时，是否加上site:www.zhihu.com
     private Boolean isSearchFromZhihuOnly;
 
 
@@ -57,7 +60,7 @@ public class QuestionFromBaidu implements Question {
             for (int i = ConstantsHelper.PageHelper.STARTINDEX; i <= ConstantsHelper.PageHelper.MAXPAGENUM; i++) {
                 QuestionResultDto pagedResult = new QuestionResultDto();
                 int pn = i * ConstantsHelper.PageHelper.PAGESIZE;
-                keyword = isSearchFromZhihuOnly ? keyword + " " + "site:www.zhihu.com" : keyword;
+                keyword = isSearchFromZhihuOnly ? keyword + " " + _zhihuSpecificSite : keyword;
                 String keyEncode = URLEncoder.encode(keyword, String.valueOf(Charsets.UTF_8));
                 StringBuilder sb = new StringBuilder(_baiduUrlPrefix);
                 sb.append("&wd=");
