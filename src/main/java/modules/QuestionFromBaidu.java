@@ -18,25 +18,20 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 
-public class QuestionFromBaidu implements Question {
+public class QuestionFromBaidu extends QuestionBase implements IQuestion {
     private static Properties properties = Helper.GetAppProperties();
     private static String _baiduUrlPrefix = properties.getProperty("baiduUrlPrefix");
     private static String _zhihuSpecificSite = properties.getProperty("zhihuSpecificSite");
-    //所有热词
-    private List<String> hotWordList;
+
     //搜索时，是否加上site:www.zhihu.com
     private Boolean isSearchFromZhihuOnly;
 
-
     public QuestionFromBaidu(List<String> hotWords, Boolean isSearchFromZhihuOnly) {
-        hotWordList = hotWords;
+        super(hotWords);
+        //hotWordList = hotWords;
         this.isSearchFromZhihuOnly = isSearchFromZhihuOnly;
     }
 
-
-    public List<String> getHotWordList() {
-        return hotWordList;
-    }
 
     public Boolean getSearchFromZhihuOnly() {
         return isSearchFromZhihuOnly;
@@ -50,7 +45,7 @@ public class QuestionFromBaidu implements Question {
         List<QuestionResultDto> zhiHuQuestions = new ArrayList<>();
         Properties pro = Helper.GetAppProperties();
         if (pro != null) {
-            for (String q : hotWordList
+            for (String q : this.getHotWordList()
             ) {
                 pagedHtmlList.addAll(sendHttpGetRequest(q, Boolean.parseBoolean(pro.getProperty("isConnectedByProxy"))));
             }
@@ -85,17 +80,9 @@ public class QuestionFromBaidu implements Question {
 
                 HttpsURLConnection conn = SendRequest.createHttpConnection(sb.toString(), isConnectedByProxy);
                 if (conn != null) {
-                    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    StringBuilder sbResp = new StringBuilder();
-                    String line;
-                    while ((line = rd.readLine()) != null) {
-                        sbResp.append(line);
-                    }
-                    rd.close();
-                    conn.disconnect();
-
+                    String sbResp = Helper.getHttpsURLConnectionResponse(conn);
                     pagedResult.setPageIndex(i + 1);
-                    pagedResult.setPagedHtmlResponse(sbResp.toString());
+                    pagedResult.setPagedHtmlResponse(sbResp);
                     results.add(pagedResult);
                 }
             }

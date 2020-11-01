@@ -4,6 +4,6 @@ import Dto.QuestionResultDto;
 import java.util.List;
 
 
-public interface Question {
+public interface IQuestion {
     List<QuestionResultDto> getQuestion();
 }
