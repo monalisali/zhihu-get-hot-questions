@@ -2,18 +2,19 @@ package modules;
 
 import Dto.QuestionResultDto;
 import Utils.ConstantsHelper;
+import Utils.Helper;
 import org.apache.commons.codec.Charsets;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 
@@ -45,16 +46,27 @@ public class QuestionFromBaidu implements Question {
     public List<QuestionResultDto> getQuestion() {
         List<QuestionResultDto> pagedHtmlList = new ArrayList<>();
         List<QuestionResultDto> result = new ArrayList<>();
-        for (String q : hotWordList
-        ) {
-            pagedHtmlList.addAll(sendHttpGetRequest(q));
+        List<QuestionResultDto> zhiHuQuestions = new ArrayList<>();
+        Properties pro = Helper.GetAppProperties();
+        if (pro != null) {
+            for (String q : hotWordList
+            ) {
+                pagedHtmlList.addAll(sendHttpGetRequest(q, Boolean.parseBoolean(pro.getProperty("isConnectedByProxy"))));
+            }
+            List<QuestionResultDto> links = parsePagedHtml(pagedHtmlList);
+            //解析百度加密过的知乎链接，并赋值给属性
+            links.forEach(x -> x.setLink(SendRequest.getHttpResponseLocation(x.getDeCodeLink())));
+            //只保留链接中有question的链接
+            zhiHuQuestions = links.stream().filter(x -> x.getLink().contains("/question/")).collect(Collectors.toList());
+            cleanLink(zhiHuQuestions);
+            zhiHuQuestions.forEach(x -> x.getLink().trim());
+            result = zhiHuQuestions.stream().distinct().collect(Collectors.toList());
         }
-        List<QuestionResultDto> links = parsePagedHtml(pagedHtmlList);
-        result.addAll(links.stream().distinct().collect(Collectors.toList()));
+
         return result;
     }
 
-    private List<QuestionResultDto> sendHttpGetRequest(String keyword) {
+    private List<QuestionResultDto> sendHttpGetRequest(String keyword, boolean isConnectedByProxy) {
         List<QuestionResultDto> results = new ArrayList<>();
         try {
             for (int i = ConstantsHelper.PageHelper.STARTINDEX; i <= ConstantsHelper.PageHelper.MAXPAGENUM; i++) {
@@ -70,7 +82,7 @@ public class QuestionFromBaidu implements Question {
                 sb.append("&bs=");
                 sb.append(keyEncode);
 
-                HttpsURLConnection conn = SendRequest.CreateHttpConnection(sb.toString());
+                HttpsURLConnection conn = SendRequest.createHttpConnection(sb.toString(), isConnectedByProxy);
                 if (conn != null) {
                     BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder sbResp = new StringBuilder();
@@ -95,7 +107,7 @@ public class QuestionFromBaidu implements Question {
 
     private List<QuestionResultDto> parsePagedHtml(List<QuestionResultDto> pagedHmls) {
         List<QuestionResultDto> result = new ArrayList<>();
-        for(int i = 0 ; i < pagedHmls.size();i++){
+        for (int i = 0; i < pagedHmls.size(); i++) {
             QuestionResultDto html = pagedHmls.get(i);
             Document document = Jsoup.parse(html.getPagedHtmlResponse());
             Elements elements = document.getElementsByTag("h3");
@@ -106,11 +118,20 @@ public class QuestionFromBaidu implements Question {
                 if (!href.isEmpty()) {
                     QuestionResultDto temp = new QuestionResultDto();
                     temp.setLinkIndex(i + 1);
-                    temp.setLink(href);
+                    temp.setDeCodeLink(href);
                     result.add(temp);
                 }
             }
         }
         return result;
+    }
+
+    private void cleanLink(List<QuestionResultDto> links) {
+        for (QuestionResultDto q : links
+        ) {
+            if (q.getLink().contains("/answer")) {
+                q.setLink(q.getLink().substring(0, q.getLink().indexOf("/answer")));
+            }
+        }
     }
 }

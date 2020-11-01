@@ -7,6 +7,8 @@ public class QuestionResultDto {
     private String pagedHtmlResponse;
     private int linkIndex;
     private String link;
+    private String deCodeLink;
+
 
     public int getPageIndex() {
         return pageIndex;
@@ -15,7 +17,6 @@ public class QuestionResultDto {
     public void setPageIndex(int pageIndex) {
         this.pageIndex = pageIndex;
     }
-
 
     public String getPagedHtmlResponse() {
         return pagedHtmlResponse;
@@ -34,13 +35,20 @@ public class QuestionResultDto {
         this.linkIndex = linkIndex;
     }
 
-
     public String getLink() {
         return link;
     }
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public String getDeCodeLink() {
+        return deCodeLink;
+    }
+
+    public void setDeCodeLink(String deCodeLink) {
+        this.deCodeLink = deCodeLink;
     }
 
     @Override
