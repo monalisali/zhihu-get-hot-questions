@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.Properties;
 
 public class Helper {
-    public static Properties GetAppProperties(){
+    public static Properties GetAppProperties() {
         Properties pro = null;
         try {
             pro = new Properties();
@@ -20,10 +20,10 @@ public class Helper {
         return pro;
     }
 
-    public static String getHttpsURLConnectionResponse (HttpsURLConnection connection){
+    public static String getHttpsURLConnectionResponse(HttpsURLConnection connection) {
         StringBuilder sbResp = new StringBuilder();
 
-        if(connection != null){
+        if (connection != null) {
             try {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String line;
@@ -41,8 +41,8 @@ public class Helper {
         return sbResp.toString();
     }
 
-    public static boolean SaveBase64ToImage(String imgStr,String imgFilePath) { // 对字节数组字符串进行Base64解码并生成图片
-
+    // 对字节数组字符串进行Base64解码并生成图片
+    public static boolean SaveBase64ToImage(String imgStr, String imgFilePath) {
         if (imgStr.isEmpty()) // 图像数据为空
             return false;
 
@@ -67,5 +67,6 @@ public class Helper {
         }
 
     }
+
 
 }
