@@ -41,7 +41,7 @@ public class Helper {
         return sbResp.toString();
     }
 
-    public static boolean Base64ToImage(String imgStr,String imgFilePath) { // 对字节数组字符串进行Base64解码并生成图片
+    public static boolean SaveBase64ToImage(String imgStr,String imgFilePath) { // 对字节数组字符串进行Base64解码并生成图片
 
         if (imgStr.isEmpty()) // 图像数据为空
             return false;

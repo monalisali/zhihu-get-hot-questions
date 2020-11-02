@@ -30,57 +30,8 @@ public class Crawler {
     public static void main(String[] args) {
         //测试
         System.out.println("测试开始");
-        Properties properties = Helper.GetAppProperties();
-        CloseableHttpResponse httpResponse = SendRequest.sendHttpGet(properties.getProperty("zhiCaptchaApiEn"),false);
-        HttpEntity entity = httpResponse.getEntity();
-        try {
-            InputStream is = entity.getContent();
-            String html = IOUtils.toString(is, "UTF-8");
-            Document document = Jsoup.parse(html);
-            JSONObject bodyHtml  = JSON.parseObject(document.getElementsByTag("body").html());
-            boolean show_captcha =  bodyHtml.getBooleanValue("show_captcha");
-            String capsionTicket = "";
-            String img64 = "";
-            String capsionCode = "";
-            //True: 需要发送第二次
-            if(show_captcha){
-              Header[] firstRequestRespSetCookie = httpResponse.getHeaders("set-cookie");
-                for (Header h: firstRequestRespSetCookie
-                     ) {
-                    String val = h.getValue();
-                    if(val.contains("capsion_ticket")){
-                        capsionTicket = val.substring(0,val.indexOf("Domain") - 1);
-                        break;
-                    }
-                }
-
-                //第二次发送时：必须把第一次发送的返回结果：capsion_ticket的值存入到cookie中
-                HttpPut httpPut = new HttpPut(properties.getProperty("zhiCaptchaApiEn"));
-                httpPut.setHeader("cookie",capsionTicket);
-                CloseableHttpClient httpPutClient = HttpClients.createDefault();
-                CloseableHttpResponse putResponse = httpPutClient.execute(httpPut);
-                HttpEntity putEntity = putResponse.getEntity();
-
-                InputStream httpPutStream = putEntity.getContent();
-                String putHtml = IOUtils.toString(httpPutStream, "UTF-8");
-                Document putDocument = Jsoup.parse(putHtml);
-                JSONObject img64Body  = JSON.parseObject(putDocument.getElementsByTag("body").html());
-                img64 = img64Body.getString("img_base64").replace("\n","");
-                Helper.Base64ToImage(img64,"C:/temp/zhiHuYanZheng.jpg");
-            }
-
-            System.out.println(document);
-            System.out.println(img64);
-            System.out.println(capsionCode);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-
+        ZhiHuLoginApi loginApi = new ZhiHuLoginApi();
+        loginApi.Login();
 //        List<String> hotWords = new ArrayList<>();
 //        hotWords.add("保温饭盒");
 //        QuestionFromZhihu zhihu = new QuestionFromZhihu(hotWords);
