@@ -6,4 +6,5 @@ public class ConstantsHelper {
         public static final int PAGESIZE = 10;
         public static final int STARTINDEX = 0;
     }
+
 }

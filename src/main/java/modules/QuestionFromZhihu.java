@@ -20,6 +20,10 @@ public class QuestionFromZhihu extends QuestionBase implements IQuestion {
         super(hotWords);
     }
 
+
+
+
+
     @Override
     public List<QuestionResultDto> getQuestion() {
         for (String h: this.getHotWordList()
