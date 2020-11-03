@@ -19,9 +19,12 @@ import org.jsoup.nodes.Document;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
@@ -182,6 +185,19 @@ public class ZhiHuLoginApi {
             e.printStackTrace();
         }
         return hex;
+    }
+
+    private String getXsrf(){
+        String xsrf = "";
+        HttpsURLConnection xsrfGetCnn = SendRequest.createHttpConnection("https://www.zhihu.com/",
+                Boolean.parseBoolean(properties.getProperty("isConnectedByProxy")),"GET");
+        xsrfGetCnn.setInstanceFollowRedirects(false);
+        if (xsrfGetCnn != null) {
+            String sbResp = Helper.getHttpsURLConnectionResponse(xsrfGetCnn);
+            String aa = "aa";
+        }
+
+        return xsrf;
     }
 
 }
