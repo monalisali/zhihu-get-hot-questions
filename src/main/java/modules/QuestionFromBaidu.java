@@ -78,7 +78,7 @@ public class QuestionFromBaidu extends QuestionBase implements IQuestion {
                 sb.append("&bs=");
                 sb.append(keyEncode);
 
-                HttpsURLConnection conn = SendRequest.createHttpConnection(sb.toString(), isConnectedByProxy);
+                HttpsURLConnection conn = SendRequest.createHttpConnection(sb.toString(), isConnectedByProxy,"GET");
                 if (conn != null) {
                     String sbResp = Helper.getHttpsURLConnectionResponse(conn);
                     pagedResult.setPageIndex(i + 1);

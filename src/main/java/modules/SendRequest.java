@@ -25,7 +25,7 @@ public class SendRequest {
     }
 
 
-    public static HttpsURLConnection createHttpConnection(String requestUrl,boolean isConnectedByProxy){
+    public static HttpsURLConnection createHttpConnection(String requestUrl,boolean isConnectedByProxy,String method){
         HttpsURLConnection conn = null;
         try {
             URL url = new URL(requestUrl);
@@ -36,7 +36,7 @@ public class SendRequest {
             else{
                 conn = (HttpsURLConnection) url.openConnection();
             }
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod(method);
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestProperty("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.9");
@@ -54,6 +54,7 @@ public class SendRequest {
         try {
             URL url = new URL(requestUrl);
             if(isConnectedByProxy){
+                //127.0.0.1:58591是翻墙软件中的配置，直接copy过来用
                 Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 58591));
                 conn = (HttpsURLConnection) url.openConnection(proxy);
             }

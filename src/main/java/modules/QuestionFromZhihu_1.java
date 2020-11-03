@@ -1,5 +1,6 @@
 package modules;
 
+import Dto.ZhihuLoginDto;
 import Utils.Helper;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -20,104 +21,24 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import javax.script.*;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
-public class ZhiHuLoginApi {
+public class QuestionFromZhihu_1 {
     private Properties properties = Helper.GetAppProperties();
-    private String captcha;
-    private String signature;
-
-    public String getUserAgent() {
-        return properties.getProperty("userAgent");
-    }
-
-
-    public String getReferer() {
-        return properties.getProperty("zhiHuRefer");
-    }
-
-
-    public String getHost() {
-        return properties.getProperty("zhiHuHost");
-    }
-
-
-    public String getAcceptEncoding() {
-        return properties.getProperty("acceptEncoding");
-    }
-
-    public String getZhiHuLoginApi() {
-        return properties.getProperty("zhiHuLoginApi");
-    }
-
-    public String getUtmSource() {
-        return "";
-    }
-
-    public String getUsername() {
-        return properties.getProperty("userName");
-    }
-
-    public String getTimestamp() {
-        return String.valueOf(System.currentTimeMillis());
-    }
-
-
-    public String getSource() {
-        return properties.getProperty("source");
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public String getRefSource() {
-        return properties.getProperty("refSource");
-    }
-
-
-    public String getPassword() {
-        return properties.getProperty("thePassword");
-    }
-
-    public String getLang() {
-        return properties.getProperty("theLang");
-    }
-
-
-    public String getGrantType() {
-        return properties.getProperty("grantType");
-    }
-
-    public String getCaptcha() {
-        return captcha;
-    }
-
-    public void setCaptcha(String captcha) {
-        this.captcha = captcha;
-    }
-
-
-    public String getClientId() {
-        return properties.getProperty("clientId");
-    }
+    private ZhihuLoginDto zhihuLoginDto = new ZhihuLoginDto();
 
     public void Login() {
         String captCha = getCaptchaByApi();
         String signature = getHAMCSignature();
-        setCaptcha(captCha);
-        setSignature(signature);
+        zhihuLoginDto.setCaptcha(captCha);
+        zhihuLoginDto.setSignature(signature);
 
     }
 
@@ -169,7 +90,7 @@ public class ZhiHuLoginApi {
 
     private String getHAMCSignature() {
         String hex = "";
-        String singStr = getGrantType() + getClientId() + getSource() + getTimestamp();
+        String singStr = zhihuLoginDto.getGrantType() + zhihuLoginDto.getClientId() + zhihuLoginDto.getSource() + zhihuLoginDto.getTimestamp();
         try {
             String key = properties.getProperty("HAMCShaKey");
             byte[] data = key.getBytes(String.valueOf(Charsets.UTF_8));
@@ -187,6 +108,7 @@ public class ZhiHuLoginApi {
         return hex;
     }
 
+    /*
     private String getXsrf(){
         String xsrf = "";
         HttpsURLConnection xsrfGetCnn = SendRequest.createHttpConnection("https://www.zhihu.com/",
@@ -199,5 +121,56 @@ public class ZhiHuLoginApi {
 
         return xsrf;
     }
+
+    private void encrypt(ZhihuLoginDto dto){
+        try {
+
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("javascript");
+            String jsFileName = "./encrypt.js";   // 读取js文件
+            FileReader reader = new FileReader(jsFileName);;  // 执行指定脚本
+
+            engine.eval(reader);
+            // 调用merge方法，并传入两个参数
+            if(engine instanceof Invocable) {
+                Invocable invoke = (Invocable) engine;
+                String reqeustParam = formatLoginDtoToUrl(dto);
+                String s = (String)invoke.invokeFunction("Q", URLEncoder.encode(reqeustParam,String.valueOf(Charsets.UTF_8)));
+                String aa = "ss";
+            }
+        } catch (ScriptException | NoSuchMethodException | IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String formatLoginDtoToUrl(ZhihuLoginDto dto){
+        StringBuilder sb = new StringBuilder();
+        sb.append("client_id=");
+        sb.append(dto.getClientId());
+        sb.append("&grant_type=");
+        sb.append(dto.getGrantType());
+        sb.append("&source=");
+        sb.append(dto.getSource());
+        sb.append("&username=");
+        sb.append(dto.getUsername());
+        sb.append("&password=");
+        sb.append(dto.getPassword());
+        sb.append("&lang=");
+        sb.append(dto.getLang());
+        sb.append("&ref_source=");
+        sb.append(dto.getRefSource());
+        sb.append("&utm_source=");
+        sb.append(dto.getUtmSource());
+        sb.append("&captcha=");
+        sb.append(dto.getCaptcha());
+        sb.append("&timestamp=");
+        sb.append(dto.getTimestamp());
+        sb.append("&signature=");
+        sb.append(dto.getSignature());
+
+    return sb.toString();
+    }
+    */
 
 }
