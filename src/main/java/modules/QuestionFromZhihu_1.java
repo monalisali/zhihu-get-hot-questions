@@ -35,11 +35,11 @@ public class QuestionFromZhihu_1 {
     private ZhihuLoginDto zhihuLoginDto = new ZhihuLoginDto();
 
     public void Login() {
+
         String captCha = getCaptchaByApi();
         String signature = getHAMCSignature();
         zhihuLoginDto.setCaptcha(captCha);
         zhihuLoginDto.setSignature(signature);
-
     }
 
     private String getCaptchaByApi() {
@@ -135,7 +135,7 @@ public class QuestionFromZhihu_1 {
             if(engine instanceof Invocable) {
                 Invocable invoke = (Invocable) engine;
                 String reqeustParam = formatLoginDtoToUrl(dto);
-                String s = (String)invoke.invokeFunction("Q", URLEncoder.encode(reqeustParam,String.valueOf(Charsets.UTF_8)));
+                String s = (String)invoke.invokeFunction("b", URLEncoder.encode(reqeustParam,String.valueOf(Charsets.UTF_8)));
                 String aa = "ss";
             }
         } catch (ScriptException | NoSuchMethodException | IOException e) {
