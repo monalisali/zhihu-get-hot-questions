@@ -1,5 +1,6 @@
 package modules;
 
+import Dto.JingDongRequestDataDto;
 import Dto.ZhihuLoginDto;
 import Utils.Helper;
 import com.alibaba.fastjson.JSON;
@@ -23,9 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import javax.script.*;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
@@ -35,7 +34,7 @@ public class QuestionFromZhihu_1 {
     private ZhihuLoginDto zhihuLoginDto = new ZhihuLoginDto();
 
     public void Login() {
-
+        getUnionGoods();
         String captCha = getCaptchaByApi();
         String signature = getHAMCSignature();
         zhihuLoginDto.setCaptcha(captCha);
@@ -106,6 +105,53 @@ public class QuestionFromZhihu_1 {
             e.printStackTrace();
         }
         return hex;
+    }
+
+    private String getUnionGoods(){
+        String requestUrl = "https://union.jd.com/api/goods/search";
+        try {
+            URL url = new URL(requestUrl);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            conn.setRequestProperty("Accept","application/json, text/plain, */*");
+            conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36");
+            //conn.setRequestProperty("referer","https://union.jd.com/proManager/index?pageNo=1");
+            conn.connect();
+
+            DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+            JSONObject param = new JSONObject();
+            JingDongRequestDataDto d = new JingDongRequestDataDto("kt1","st1","电脑");
+            param.put("data", d);
+            param.put("pageNo", 1);
+            param.put("pageSize",60);
+            param.put("searchUUID","");
+            out.write(param.toString().getBytes("UTF-8"));
+            out.flush();
+            out.close();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String lines;
+            StringBuffer sb = new StringBuffer("");
+            while ((lines = reader.readLine()) != null) {
+                lines = new String(lines.getBytes(), "utf-8");
+                sb.append(lines);
+            }
+            System.out.println(sb);
+
+
+
+            reader.close();
+            // 断开连接
+            conn.disconnect();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     /*
